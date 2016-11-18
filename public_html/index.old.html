@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Image Sonification - Othniel Cundangan</title>
+  <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <!-- Reset browser's built-in styles -->
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.18.1/build/cssreset/cssreset-min.css">
+
+  <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <!-- DSP.js (Digital Sound Processing javascript library) -->
+    <script src="dsp.js"></script>
+
+  <style>
+    .outer {
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    .middle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    .inner {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+    * {
+      /*outline: black solid thin;*/
+    }
+    /*html{
+      min-height:100%;
+    }
+    body{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 0 200px rgba(0,0,0,0.9) inset;
+      min-height:100%;
+    }*/
+    #alert-placeholder {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .off-screen {
+      position: absolute;
+      left: -1000000px;
+      top: -1000000px;
+    }
+    .file-picker {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .outline {
+      outline: black solid thin;
+    }
+  </style>
+</head>
+<body>
+  <div class="outer">
+    <div class="middle">
+      <div class="inner">
+        <div id="drop-zone">
+          <div class="upload-box-container">
+            <div class="file-picker">
+              <input id="file" class="hidden" type="file" name="file" accept="image/x-png, image/gif, image/jpeg">
+              <label id="file-selector" for="file" type="button" class="btn btn-default">Choose/Drag Image</label>
+              <button id="sonify-button" onclick="sonify()" type="button" class="btn btn-primary">Sonify</button>
+            </div>
+            <img id="image" class="invisible off-screen">
+            <canvas id="pixelCanvas" width="0" height="0">
+              Your browser does not support the HTML5 canvas tag.
+            </canvas>
+            <br>
+            <canvas id="waveCanvas" width="0" height="0"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <ul id="alert-placeholder">
+    </ul>
+  </div>
+
+  <script>
+    // Initialize the canvases
+    var pixCanvas = $('#pixelCanvas')[0];
+    var pixCtx = pixCanvas.getContext('2d');
+    var wavCanvas = $('#waveCanvas')[0];
+    var wavCtx = wavCanvas.getContext('2d');
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    var analyser = audioContext.createAnalyser();
+
+    // Placeholder for FileReader
+    var fileReader;
+
+    // Setup alert system
+    var timeoutID;
+    var alertCount = 0;
+    function bootstrapAlert(message, type='danger') {
+      var stringBuilder = [];
+      stringBuilder.push('<div id="alert');
+      stringBuilder.push(alertCount);
+      stringBuilder.push('" class="alert alert-');
+      stringBuilder.push(type);
+      stringBuilder.push(' alert-dismissible fade" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+      stringBuilder.push(message);
+      stringBuilder.push('</div>');
+      $('#alert-placeholder').append(stringBuilder.join(''));
+      setTimeout(function() { $('#alert'+alertCount++).addClass('in'); }, 10);
+      clearTimeout(timeoutID);
+      timeoutID = setTimeout(function() {
+        $('.alert').alert('close');
+      }, 4000);
+    }
+
+    // Check for the various File API support.
+    if (window.File && window.FileReader) {
+      fileReader = new FileReader();
+      fileReader.onload = function(event) {
+        $('#image')[0].src = event.target.result
+      };
+    }
+    else {
+      bootstrapAlert('The File APIs are not fully supported in this browser.');
+    }
+
+    var _file;
+    function setFile(file) {
+      if (!file) {
+        return;
+      }
+      _file = file;
+      $('button').prop('disabled', true);
+      $('#file-selector').html(file.name);
+      fileReader.readAsDataURL(file);
+    }
+
+    function handleFileSelect(evt) {
+      evt = evt.originalEvent;
+      evt.stopPropagation();
+      evt.preventDefault();
+      var files = evt.target.files;
+      var file = files[0];
+      setFile(file);
+    }
+
+    function handleFileDrop(evt) {
+      evt = evt.originalEvent;
+      evt.stopPropagation();
+      evt.preventDefault();
+      var files = evt.dataTransfer.files;
+      var file = files[0];
+      setFile(file);
+    }
+
+    function handleDragOver(evt) {
+      evt = evt.originalEvent;
+      evt.stopPropagation();
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = 'copy'; // Set the cursor to a copy symbol
+    }
+
+    var IMG_LEN = 32;
+    $('#image')[0].onload = function() {
+      pixCanvas.width = IMG_LEN;
+      pixCanvas.height = IMG_LEN;
+      pixCtx.drawImage(this, 0, 0, IMG_LEN, IMG_LEN);
+      var imgData = pixCtx.getImageData(0, 0, pixCanvas.width, pixCanvas.height);
+      var data = imgData.data;
+      // for(var i = 0; i < data.length; i += 4) {
+      //   // Human eye is most sensitive to green, least sensitive to blue
+      //   var brightness = .3 * data[i] + 0.59 * data[i+1] + 0.11 * data[i+2];
+      //   data[i] = brightness;
+      //   data[i+1] = brightness;
+      //   data[i+2] = brightness;
+      // }
+      // // overwrite original image
+      // pixCtx.putImageData(imgData, 0, 0);
+      $('#sonify-button').prop('disabled', false);
+      $('#pixelCanvas').addClass('outline');
+      bootstrapAlert('Loaded ' + _file.name, 'info');
+    }
+
+    function ROW(row) {
+      return row*IMG_LEN*4;
+    }
+
+    function COL(col) {
+      return col*4;
+    }
+
+    Number.prototype.clamp = function(min, max) {
+      return Math.min(Math.max(this, min), max);
+    };
+
+    function drawWave() {
+      var bufferLength = analyser.frequencyBinCount;
+      var dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+      $('#waveCanvas').addClass('outline');
+      wavCanvas.width = 400;
+      wavCanvas.height = 200;
+      wavCtx.fillStyle = 'rgb(255, 255, 255)';
+        wavCtx.fillRect(0, 0, wavCanvas.width, wavCanvas.height);
+      wavCtx.lineWidth = 1;
+      wavCtx.strokeStyle = 'rgb(0, 0, 0)';
+      wavCtx.beginPath();
+        var sliceWidth = wavCanvas.width * 1.0 / bufferLength;
+        var x = 0;
+        for(var i = 0; i < bufferLength; i++) {
+          var v = dataArray[i] / 128.0;
+          var y = v * wavCanvas.height/2;
+          if(i === 0) {
+            wavCtx.moveTo(x, y);
+          } else {
+            wavCtx.lineTo(x, y);
+          }
+          x += sliceWidth;
+        }
+        wavCtx.lineTo(wavCanvas.width, wavCanvas.height/2)
+      wavCtx.stroke();
+      setTimeout(requestAnimationFrame, 59, drawWave);
+      // requestAnimationFrame(drawWave);
+    }
+
+    var osc = audioContext.createOscillator();
+    function sonify() {
+      if (_file === undefined) {
+        bootstrapAlert('No file chosen. Please select an image.');
+        return;
+      }
+
+      $('#sonify-button').prop('disabled', true);
+
+      var real = new Float32Array(IMG_LEN*IMG_LEN*3);
+      var image = new Float32Array(real.length);
+
+      var imgData = pixCtx.getImageData(0, 0, pixCanvas.width, pixCanvas.height);
+      var data = imgData.data;
+      for (var i = 0; i < IMG_LEN; i++) {
+        for (var j = 0; j < IMG_LEN; j++) {
+          for (var k = 0; k < 3; k++) {
+            var val = data[ROW(i) + COL(j) + k];
+            real[i*IMG_LEN + j*3 + k] = val/255.0;
+          }
+        }
+      }
+
+      var timeDomainSignal = audioContext.createPeriodicWave(real, real);
+
+      osc.setPeriodicWave(timeDomainSignal);
+      osc.frequency.value = 1;
+      analyser.fftSize = 16384;
+      osc.connect(analyser);
+      analyser.connect(audioContext.destination);
+      osc.start();
+      drawWave();
+      $('#sonify-button').prop('disabled', false);
+
+      bootstrapAlert('Playing ' + _file.name, 'success');
+    }
+
+    $('body').on('dragover', handleDragOver);
+    $('body').on('drop', handleFileDrop);
+    $('#file').on('change', handleFileSelect);
+  </script>
+</body>
+</html>

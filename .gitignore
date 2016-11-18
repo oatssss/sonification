@@ -1,0 +1,9 @@
+# Ignore node modules
+node_modules/
+
+# intelliJ IDE files
+.idea/
+
+.ftpconfig
+bundle.js
+
