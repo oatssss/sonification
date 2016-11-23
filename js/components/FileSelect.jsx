@@ -17,14 +17,7 @@ export default class FileSelect extends Component {
     constructor(props) {
         super(props);
 
-        this.sonify = this.sonify.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
-
         this.fileReader = undefined;
-    }
-
-    sonify() {
-
     }
 
     componentDidMount() {
@@ -56,7 +49,7 @@ export default class FileSelect extends Component {
             <div className={classes.fileOptions}>
                 <input ref={fileSelect => this.fileSelect = fileSelect} id='file' className='hidden' type='file' name='file' accept='image/x-png, image/gif, image/jpeg'/>
                 <label id='file-selector' htmlFor='file' type='button' className={`${classes.filePicker} btn btn-default`}>Choose/Drag Image</label>
-                <button id='sonify-button' onClick={this.sonify} type='button' className='btn btn-primary'>Sonify</button>
+                <button id='sonify-button' onClick={this.props.onSonify} type='button' className='btn btn-primary'>Sonify</button>
             </div>
         );
     }
@@ -66,4 +59,5 @@ FileSelect.propTypes = {
     sheet: PropTypes.object,
     children: PropTypes.node,
     onImgSelect: PropTypes.func,
+    onSonify: PropTypes.func,
 };

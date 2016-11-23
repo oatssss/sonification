@@ -4,10 +4,22 @@ import ImgCanvas from '../ImgCanvas.jsx';
 
 const jssClasses = {};
 
+export const DefaultSize = 512;
+
 @injectSheet(jssClasses)
 export default class GoogleVisionAPI extends Component {
     constructor(props) {
         super(props);
+
+        this.sonify = this.sonify.bind(this);
+    }
+
+    sonify() {
+        console.log('Sonify GVAPI');
+    }
+
+    componentDidMount() {
+        this.props.hocRef(this);
     }
 
     render() {
@@ -15,7 +27,7 @@ export default class GoogleVisionAPI extends Component {
 
         return (
             <div>
-                <ImgCanvas/>
+                <ImgCanvas imgSrc={this.props.imgSrc} size={DefaultSize} canvasID='kanvas-gvapi'/>
                 <br/>
                 Google Vision API Description
             </div>
@@ -25,5 +37,7 @@ export default class GoogleVisionAPI extends Component {
 
 GoogleVisionAPI.propTypes = {
     sheet: PropTypes.object,
-    children: PropTypes.node
+    children: PropTypes.node,
+    hocRef: PropTypes.func,
+    imgSrc: PropTypes.string,
 };

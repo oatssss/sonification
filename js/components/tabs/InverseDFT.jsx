@@ -34,6 +34,8 @@ export default class InverseDFT extends Component {
         super(props);
 
         this.sizeSelect = this.sizeSelect.bind(this);
+        this.sonify = this.sonify.bind(this);
+        this.sonifyColumn = this.sonifyColumn.bind(this);
 
         this.state = {
             size: DefaultSize,
@@ -48,6 +50,18 @@ export default class InverseDFT extends Component {
         });
     }
 
+    sonify() {
+        console.log('Sonify IDFT');
+    }
+
+    sonifyColumn() {
+
+    }
+
+    componentDidMount() {
+        this.props.hocRef(this);
+    }
+
     render() {
         const {sheet: {classes}, children} = this.props;
 
@@ -55,7 +69,7 @@ export default class InverseDFT extends Component {
             <div className={classes.centerHorizontal}>
                 <div className={classes.container}>
                     <Centered className={classes.flexGrow}>
-                        <InteractableCanvas imgSrc={this.props.imgSrc} size={this.state.size}/>
+                        <InteractableCanvas imgSrc={this.props.imgSrc} size={this.state.size} canvasID='kanvas-idft'/>
                         <br/>
                         IDFT Description
                     </Centered>
@@ -78,4 +92,5 @@ InverseDFT.propTypes = {
     sheet: PropTypes.object,
     children: PropTypes.node,
     imgSrc: PropTypes.string,
+    hocRef: PropTypes.func,
 };

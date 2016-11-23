@@ -26,7 +26,7 @@ export default class ImgCanvas extends Component {
 
         // Initialize the Kanva canvas
         this.stage = new Konva.Stage({
-            container: 'kanvas',
+            container: this.props.canvasID,
             width: this.props.size,
             height: this.props.size,
         });
@@ -40,7 +40,7 @@ export default class ImgCanvas extends Component {
         // Update canvas size
         if (nextProps.size) {
             this.stage = new Konva.Stage({
-                container: 'kanvas',
+                container: this.props.canvasID,
                 width: nextProps.size,
                 height: nextProps.size,
             });
@@ -69,7 +69,7 @@ export default class ImgCanvas extends Component {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            <div id='kanvas' className={classes.kanvas}/>
+            <div id={this.props.canvasID} className={classes.kanvas}/>
         );
     }
 }
@@ -79,4 +79,5 @@ ImgCanvas.propTypes = {
     children: PropTypes.node,
     size: PropTypes.number,
     imgSrc: PropTypes.string,
+    canvasID: PropTypes.string,
 };
