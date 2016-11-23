@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
 import ImgCanvas from '../ImgCanvas.jsx';
+import hocRef from '../../useful/HOCRefDecorator.jsx';
 
 const jssClasses = {
     container: {
@@ -15,6 +16,7 @@ const jssClasses = {
 export const DefaultSize = 512;
 
 @injectSheet(jssClasses)
+@hocRef
 export default class GoogleVisionAPI extends Component {
     constructor(props) {
         super(props);
@@ -25,11 +27,6 @@ export default class GoogleVisionAPI extends Component {
     sonify() {
         console.log('Sonify GVAPI');
     }
-
-    componentDidMount() {
-        this.props.hocRef(this);
-    }
-
     render() {
         const {sheet: {classes}, children} = this.props;
 
@@ -46,6 +43,5 @@ export default class GoogleVisionAPI extends Component {
 GoogleVisionAPI.propTypes = {
     sheet: PropTypes.object,
     children: PropTypes.node,
-    hocRef: PropTypes.func,
     imgSrc: PropTypes.string,
 };

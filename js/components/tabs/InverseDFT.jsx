@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
-import Centered from '../Centered.jsx';
 import InteractableCanvas from '../InteractableCanvas.jsx';
 import { Nav, NavDropdown, MenuItem } from 'react-bootstrap';
+import hocRef from '../../useful/HOCRefDecorator.jsx';
 
 const jssClasses = {
     container: {
@@ -14,7 +14,9 @@ const jssClasses = {
     },
     footer: {
         position: 'fixed',
+        left: '50%',
         bottom: 0,
+        transform: 'translateX(-50%)',
         background: 'white',
     },
 };
@@ -22,6 +24,7 @@ const jssClasses = {
 export const DefaultSize = 512;
 
 @injectSheet(jssClasses)
+@hocRef
 export default class InverseDFT extends Component {
     constructor(props) {
         super(props);
@@ -51,16 +54,17 @@ export default class InverseDFT extends Component {
 
     }
 
-    componentDidMount() {
-        this.props.hocRef(this);
-    }
-
     render() {
         const {sheet: {classes}, children} = this.props;
 
         return (
             <div className={classes.container}>
-                <InteractableCanvas imgSrc={this.props.imgSrc} size={this.state.size} canvasID='kanvas-idft'/>
+                <InteractableCanvas
+                    imgSrc={this.props.imgSrc}
+                    size={this.state.size}
+                    canvasID='kanvas-idft'
+                    sonifyColumn={this.sonifyColumn}
+                />
                 <br/>
                 IDFT Description
                 <div className={classes.footer}>
@@ -81,5 +85,4 @@ InverseDFT.propTypes = {
     sheet: PropTypes.object,
     children: PropTypes.node,
     imgSrc: PropTypes.string,
-    hocRef: PropTypes.func,
 };

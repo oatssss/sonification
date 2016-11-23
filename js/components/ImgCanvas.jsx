@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
 import { DefaultSize } from './tabs/InverseDFT.jsx';
 import Konva from 'konva';
+import hocRef from '../useful/HOCRefDecorator.jsx';
 
 const jssClasses = {
     kanvas: {
@@ -12,6 +13,7 @@ const jssClasses = {
 };
 
 @injectSheet(jssClasses)
+@hocRef
 export default class ImgCanvas extends Component {
     constructor(props) {
         super(props);
@@ -30,6 +32,8 @@ export default class ImgCanvas extends Component {
             width: this.props.size,
             height: this.props.size,
         });
+
+        console.log(`Img Canvas Mounted! Stage: ${this.stage}`);
     }
 
     componentWillUnmount() {

@@ -10,16 +10,21 @@ export default class InteractableCanvas extends ImgCanvas {
         super(props);
     }
 
+    componentDidMount() {
+        console.log(`Interactable Canvas Mounted! Stage: ${this.imgcanvas.stage}`);
+    }
+
     render() {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            super.render()
+            <ImgCanvas hocRef={(imgcanvas) => this.imgcanvas = imgcanvas} {...this.props}/>
         );
     }
 }
 
 
 InteractableCanvas.propTypes = {
-    ...(ImgCanvas.propTypes),
+    ...ImgCanvas.propTypes,
+    sonifyColumn: PropTypes.func,
 };

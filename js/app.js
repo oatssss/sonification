@@ -8,7 +8,6 @@ import ReactDOM from 'react-dom';
 // React Components
 import { Router, Route, browserHistory } from 'react-router';
 import { Tab, Nav, NavItem } from 'react-bootstrap';
-import Centered from './components/Centered.jsx';
 import InverseDFT from './components/tabs/InverseDFT.jsx';
 import GoogleVisionAPI from './components/tabs/GoogleVisionAPI.jsx';
 import FileSelect from './components/FileSelect.jsx';
