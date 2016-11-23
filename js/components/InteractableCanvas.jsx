@@ -19,6 +19,7 @@ export default class InteractableCanvas extends ImgCanvas {
     }
 }
 
-InteractableCanvas.propTypes = Object.assign(ImgCanvas.propTypes, {
 
-});
+InteractableCanvas.propTypes = {
+    ...(ImgCanvas.propTypes),
+};

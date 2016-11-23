@@ -13,7 +13,7 @@ const jssClasses = {
     },
     footer: {
         display: 'inline-block',
-        position: 'absolute',
+        position: 'fixed',
         bottom: 0,
         transform: 'translateX(-50%)',
         background: 'white',
@@ -26,6 +26,8 @@ const jssClasses = {
     }
 };
 
+export const DefaultSize = 512;
+
 @injectSheet(jssClasses)
 export default class InverseDFT extends Component {
     constructor(props) {
@@ -34,8 +36,8 @@ export default class InverseDFT extends Component {
         this.sizeSelect = this.sizeSelect.bind(this);
 
         this.state = {
-            size: 512,
-            sizeLabel: 'Image Size: 512 x 512',
+            size: DefaultSize,
+            sizeLabel: `Image Size: ${DefaultSize} x ${DefaultSize}`,
         };
     }
 
@@ -53,7 +55,7 @@ export default class InverseDFT extends Component {
             <div className={classes.centerHorizontal}>
                 <div className={classes.container}>
                     <Centered className={classes.flexGrow}>
-                        <InteractableCanvas/>
+                        <InteractableCanvas imgSrc={this.props.imgSrc} size={this.state.size}/>
                         <br/>
                         IDFT Description
                     </Centered>
@@ -74,5 +76,6 @@ export default class InverseDFT extends Component {
 
 InverseDFT.propTypes = {
     sheet: PropTypes.object,
-    children: PropTypes.node
+    children: PropTypes.node,
+    imgSrc: PropTypes.string,
 };

@@ -19,7 +19,8 @@ gulp.task('build', function() {
             'react'
         ],
         plugins: [
-            'transform-decorators-legacy'
+            'transform-decorators-legacy',
+            'transform-object-rest-spread'
         ]
     })
     .on('error', function(e) {

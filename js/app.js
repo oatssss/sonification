@@ -27,6 +27,7 @@ class App extends Component {
         super(props);
 
         this.handleTabSelect = this.handleTabSelect.bind(this);
+        this.handleImgSelect = this.handleImgSelect.bind(this);
 
         this.state = {
             tab: 0,
@@ -37,16 +38,20 @@ class App extends Component {
         this.setState({tab});
     }
 
+    handleImgSelect(imgSrc) {
+        this.setState({imgSrc});
+    }
+
     render() {
         const {sheet: {classes}, children} = this.props;
 
         return (
             <Tabs activeKey={this.state.tab} onSelect={this.handleTabSelect} id='tabs'>
                 <div className={classes.tabContent}>
-                    <FileSelect/>
+                    <FileSelect onImgSelect={this.handleImgSelect}/>
                 </div>
                 <Tab eventKey={0} title="Row/Column IDFT">
-                    <InverseDFT/>
+                    <InverseDFT imgSrc={this.state.imgSrc}/>
                 </Tab>
                 <Tab eventKey={1} title="Google Vision API" disabled>
                     <Centered>
