@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 
 // React Components
 import { Router, Route, browserHistory } from 'react-router';
-import { Tabs, Tab } from 'react-bootstrap';
+import { Tab, Nav, NavItem } from 'react-bootstrap';
 import Centered from './components/Centered.jsx';
 import InverseDFT from './components/tabs/InverseDFT.jsx';
 import GoogleVisionAPI from './components/tabs/GoogleVisionAPI.jsx';
@@ -19,8 +19,21 @@ const TAB_GVAPI = 1;
 
 const jssClasses = {
     tabContent: {
-        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: 'calc(100vh - 42px)',
     },
+    innerContent: {
+        flex: '1 0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
 };
 
 @injectSheet(jssClasses)
@@ -62,19 +75,25 @@ class App extends Component {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            <Tabs activeKey={this.state.tab} onSelect={this.handleTabSelect} id='tabs'>
-                <div className={classes.tabContent}>
-                    <FileSelect onImgSelect={this.handleImgSelect} onSonify={this.state.sonify}/>
+            <Tab.Container activeKey={this.state.tab} onSelect={this.handleTabSelect} id='tabs'>
+                <div>
+                    <Nav bsStyle='tabs'>
+                        <NavItem eventKey={TAB_IDFT}>Row/Column IDFT</NavItem>
+                        <NavItem eventKey={TAB_GVAPI}>Google Vision API</NavItem>
+                    </Nav>
+                    <div className={classes.tabContent}>
+                        <FileSelect onImgSelect={this.handleImgSelect} onSonify={this.state.sonify}/>
+                        <Tab.Content className={classes.innerContent}>
+                            <Tab.Pane eventKey={TAB_IDFT}>
+                                <InverseDFT hocRef={(idft) => this.idft = idft} imgSrc={this.state.imgSrc}/>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey={TAB_GVAPI}>
+                                <GoogleVisionAPI hocRef={(gvapi) => this.gvapi = gvapi} imgSrc={this.state.imgSrc}/>
+                            </Tab.Pane>
+                        </Tab.Content>
+                    </div>
                 </div>
-                <Tab eventKey={TAB_IDFT} title="Row/Column IDFT">
-                    <InverseDFT hocRef={(idft) => this.idft = idft} imgSrc={this.state.imgSrc}/>
-                </Tab>
-                <Tab eventKey={TAB_GVAPI} title="Google Vision API">
-                    <Centered>
-                        <GoogleVisionAPI hocRef={(gvapi) => this.gvapi = gvapi} imgSrc={this.state.imgSrc}/>
-                    </Centered>
-                </Tab>
-            </Tabs>
+            </Tab.Container>
         );
     }
 }

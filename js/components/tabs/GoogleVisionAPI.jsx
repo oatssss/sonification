@@ -2,7 +2,15 @@ import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
 import ImgCanvas from '../ImgCanvas.jsx';
 
-const jssClasses = {};
+const jssClasses = {
+    container: {
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        alignItems: 'center',
+        marginBottom: '10px',
+    },
+};
 
 export const DefaultSize = 512;
 
@@ -26,7 +34,7 @@ export default class GoogleVisionAPI extends Component {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            <div>
+            <div className={classes.container}>
                 <ImgCanvas imgSrc={this.props.imgSrc} size={DefaultSize} canvasID='kanvas-gvapi'/>
                 <br/>
                 Google Vision API Description

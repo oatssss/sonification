@@ -7,23 +7,16 @@ import { Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 const jssClasses = {
     container: {
         display: 'flex',
-        alignItems: 'center',
         flexDirection: 'column',
-        minHeight: 'calc(100vh - 42px - 54px)'
+        flexWrap: 'nowrap',
+        alignItems: 'center',
+        marginBottom: '52px',
     },
     footer: {
-        display: 'inline-block',
         position: 'fixed',
         bottom: 0,
-        transform: 'translateX(-50%)',
         background: 'white',
     },
-    flexGrow: {
-        flex: '1 0 auto',
-    },
-    centerHorizontal: {
-        textAlign: 'center',
-    }
 };
 
 export const DefaultSize = 512;
@@ -66,14 +59,10 @@ export default class InverseDFT extends Component {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            <div className={classes.centerHorizontal}>
-                <div className={classes.container}>
-                    <Centered className={classes.flexGrow}>
-                        <InteractableCanvas imgSrc={this.props.imgSrc} size={this.state.size} canvasID='kanvas-idft'/>
-                        <br/>
-                        IDFT Description
-                    </Centered>
-                </div>
+            <div className={classes.container}>
+                <InteractableCanvas imgSrc={this.props.imgSrc} size={this.state.size} canvasID='kanvas-idft'/>
+                <br/>
+                IDFT Description
                 <div className={classes.footer}>
                     <Nav activeKey={this.state.size} onSelect={this.sizeSelect} id='sizes' bsStyle='tabs'>
                         <NavDropdown title={this.state.sizeLabel} id='sizes-dropdown' dropup>

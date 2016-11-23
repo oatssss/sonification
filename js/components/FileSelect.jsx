@@ -4,8 +4,6 @@ import injectSheet from 'react-jss';
 const jssClasses = {
     fileOptions: {
         marginTop: '10px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
     },
     filePicker: {
         marginRight: '10px',
