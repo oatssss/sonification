@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
 import InteractableCanvas from '../InteractableCanvas.jsx';
+import ImgCanvas from '../ImgCanvas.jsx';
 import { Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 import hocRef from '../../useful/HOCRefDecorator.jsx';
 
@@ -19,6 +20,9 @@ const jssClasses = {
         transform: 'translateX(-50%)',
         background: 'white',
     },
+    invisible: {
+        display: 'none',
+    },
 };
 
 export const DefaultSize = 512;
@@ -30,8 +34,9 @@ export default class InverseDFT extends Component {
         super(props);
 
         this.sizeSelect = this.sizeSelect.bind(this);
+        this.setImgData = this.setImgData.bind(this);
         this.sonify = this.sonify.bind(this);
-        this.sonifyColumn = this.sonifyColumn.bind(this);
+        this.sonifyPoint = this.sonifyPoint.bind(this);
 
         this.state = {
             size: DefaultSize,
@@ -46,11 +51,15 @@ export default class InverseDFT extends Component {
         });
     }
 
-    sonify() {
-        console.log('Sonify IDFT');
+    setImgData(imgData) {
+        this.imgData = imgData;
     }
 
-    sonifyColumn() {
+    sonify() {
+        console.log(this.imgData);
+    }
+
+    sonifyPoint() {
 
     }
 
@@ -59,11 +68,20 @@ export default class InverseDFT extends Component {
 
         return (
             <div className={classes.container}>
+                <ImgCanvas
+                    className={classes.invisible}
+                    imgSrc={this.props.imgSrc}
+                    onImgLoad={this.setImgData}
+                    canvasSize={this.state.size}
+                    imgSize={this.state.size}
+                    canvasID={'kanvas-idft-invisible'}
+                />
                 <InteractableCanvas
                     imgSrc={this.props.imgSrc}
-                    size={this.state.size}
+                    canvasSize={DefaultSize}
+                    imgSize={this.state.size}
                     canvasID='kanvas-idft'
-                    sonifyColumn={this.sonifyColumn}
+                    sonifyPoint={this.sonifyPoint}
                 />
                 <br/>
                 IDFT Description

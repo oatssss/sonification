@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
-import ImgCanvas from '../ImgCanvas.jsx';
+import ResponsiveCanvas from '../ImgCanvas.jsx';
 import hocRef from '../../useful/HOCRefDecorator.jsx';
 
 const jssClasses = {
@@ -32,7 +32,12 @@ export default class GoogleVisionAPI extends Component {
 
         return (
             <div className={classes.container}>
-                <ImgCanvas imgSrc={this.props.imgSrc} size={DefaultSize} canvasID='kanvas-gvapi'/>
+                <ResponsiveCanvas
+                    imgSrc={this.props.imgSrc}
+                    canvasSize={DefaultSize}
+                    imgSize={DefaultSize}
+                    canvasID='kanvas-gvapi'
+                />
                 <br/>
                 Google Vision API Description
             </div>

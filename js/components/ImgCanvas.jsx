@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
-import { DefaultSize } from './tabs/InverseDFT.jsx';
 import Konva from 'konva';
 import hocRef from '../useful/HOCRefDecorator.jsx';
 
@@ -22,18 +21,17 @@ export default class ImgCanvas extends Component {
     componentDidMount() {
         // For some reason, componentDidMount is getting called twice
         // and the second time, the size is undefined, wtf
-        if (!this.props.size) {
+        const { canvasSize } = this.props;
+        if (!canvasSize) {
             return;
         }
 
         // Initialize the Kanva canvas
         this.stage = new Konva.Stage({
             container: this.props.canvasID,
-            width: this.props.size,
-            height: this.props.size,
+            width: canvasSize,
+            height: canvasSize,
         });
-
-        console.log(`Img Canvas Mounted! Stage: ${this.stage}`);
     }
 
     componentWillUnmount() {
@@ -41,39 +39,70 @@ export default class ImgCanvas extends Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        // Update canvas size
-        if (nextProps.size) {
-            this.stage = new Konva.Stage({
-                container: this.props.canvasID,
-                width: nextProps.size,
-                height: nextProps.size,
-            });
+        const {
+            canvasSize,
+            imgSize,
+            imgSrc,
+            onImgLoad,
+        } = nextProps;
+
+        if (this.stage && canvasSize) {
+            this.stage.width(canvasSize);
+            this.stage.height(canvasSize);
         }
 
-        // New image and layer to add to the stage
-        if (nextProps.imgSrc) {
-            const layer = new Konva.Layer();
+        if (this.stage && imgSrc && canvasSize && imgSize) {
             const imageObj = new Image();
             imageObj.onload = () => {
-
-                let img = new Konva.Image({
+                const img = new Konva.Image({
                     image: imageObj,
-                    width: nextProps.size,
-                    height: nextProps.size,
+                    width: imgSize,
+                    height: imgSize,
                 });
 
+                const layer = new Konva.Layer();
                 layer.add(img);
-                this.stage.add(layer);
+
+                if (canvasSize !== imgSize) {
+                    const scaledImageObj = new Image();
+                    scaledImageObj.onload = () => {
+
+                        const scaledImg = new Konva.Image({
+                            image: scaledImageObj,
+                            width: canvasSize,
+                            height: canvasSize,
+                        });
+
+                        const scaledLayer = new Konva.Layer();
+                        scaledLayer.add(scaledImg);
+                        this.stage.add(scaledLayer);
+                        if (onImgLoad) {
+                            const imgData = scaledImg.getCanvas().getContext().getImageData(0, 0, canvasSize, canvasSize);
+                            onImgLoad(imgData);
+                        }
+                    };
+                    scaledImageObj.src = img.toDataURL();
+                }
+                else {
+                    this.stage.add(layer);
+                    if (onImgLoad) {
+                        const imgData = img.getCanvas().getContext().getImageData(0, 0, canvasSize, canvasSize);
+                        onImgLoad(imgData);
+                    }
+                }
             };
-            imageObj.src = nextProps.imgSrc;
+            imageObj.src = imgSrc;
         }
     }
 
     render() {
-        const {sheet: {classes}, children} = this.props;
+        const { sheet: {classes}, children } = this.props;
+        let { className } = this.props;
+
+        className = classes.kanvas + ' ' + (className ? className : '');
 
         return (
-            <div id={this.props.canvasID} className={classes.kanvas}/>
+            <div id={this.props.canvasID} className={className}/>
         );
     }
 }
@@ -81,7 +110,10 @@ export default class ImgCanvas extends Component {
 ImgCanvas.propTypes = {
     sheet: PropTypes.object,
     children: PropTypes.node,
-    size: PropTypes.number,
-    imgSrc: PropTypes.string,
-    canvasID: PropTypes.string,
+    canvasSize: PropTypes.number.isRequired,
+    imgSize: PropTypes.number.isRequired,
+    imgSrc: PropTypes.string.isRequired,
+    canvasID: PropTypes.string.isRequired,
+    onImgLoad: PropTypes.func,
+    className: PropTypes.string,
 };

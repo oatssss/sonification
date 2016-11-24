@@ -45,6 +45,7 @@ class App extends Component {
 
         this.state = {
             tab: 0,
+            imgSrc: '',
         }
     }
 

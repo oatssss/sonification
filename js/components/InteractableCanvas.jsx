@@ -1,30 +1,32 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
-import ImgCanvas from './ImgCanvas.jsx';
+import ResponsiveCanvas from './ResponsiveCanvas.jsx';
 
 const jssClasses = {};
 
 @injectSheet(jssClasses)
-export default class InteractableCanvas extends ImgCanvas {
-    constructor(props) {
-        super(props);
-    }
-
+export default class InteractableCanvas extends ResponsiveCanvas {
     componentDidMount() {
-        console.log(`Interactable Canvas Mounted! Stage: ${this.imgcanvas.stage}`);
+        // ResponsiveCanvas has an HOC wrapper,
+        // so the actual canvas is a member within ResponsiveCanvas
+        // under the name 'canvas'
+        this.canvas = this.canvas.canvas;
+
+        // Setup column/row border drawing around the cursor
+
     }
 
     render() {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            <ImgCanvas hocRef={(imgcanvas) => this.imgcanvas = imgcanvas} {...this.props}/>
+            <ResponsiveCanvas {...this.props} hocRef={(canvas) => this.canvas = canvas}/>
         );
     }
 }
 
 
 InteractableCanvas.propTypes = {
-    ...ImgCanvas.propTypes,
-    sonifyColumn: PropTypes.func,
+    ...ResponsiveCanvas.propTypes,
+    sonifyPoint: PropTypes.func,
 };
