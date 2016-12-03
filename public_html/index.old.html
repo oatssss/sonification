@@ -267,6 +267,7 @@
       }
 
       var timeDomainSignal = audioContext.createPeriodicWave(real, real);
+      console.log(timeDomainSignal);
 
       osc.setPeriodicWave(timeDomainSignal);
       osc.frequency.value = 1;

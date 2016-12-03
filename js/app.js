@@ -12,6 +12,8 @@ import InverseDFT from './components/tabs/InverseDFT.jsx';
 import GoogleVisionAPI from './components/tabs/GoogleVisionAPI.jsx';
 import FileSelect from './components/FileSelect.jsx';
 import injectSheet from 'react-jss';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import CustomMuiTheme from './config/material-ui-config';
 
 const TAB_IDFT = 0;
 const TAB_GVAPI = 1;
@@ -103,4 +105,8 @@ App.proptypes = {
     children: PropTypes.node,
 };
 
-ReactDOM.render(<App/>, document.getElementById('app-container'));
+ReactDOM.render(
+    <MuiThemeProvider muiTheme={CustomMuiTheme}>
+        <App/>
+    </MuiThemeProvider>
+, document.getElementById('app-container'));

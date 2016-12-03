@@ -20,7 +20,10 @@ export default class InteractableCanvas extends ResponsiveCanvas {
         const {sheet: {classes}, children} = this.props;
 
         return (
-            <ResponsiveCanvas {...this.props} hocRef={(canvas) => this.canvas = canvas}/>
+            <ResponsiveCanvas
+                {...this.props}
+                hocRef={(canvas) => this.canvas = canvas}
+            />
         );
     }
 }
@@ -29,4 +32,5 @@ export default class InteractableCanvas extends ResponsiveCanvas {
 InteractableCanvas.propTypes = {
     ...ResponsiveCanvas.propTypes,
     sonifyPoint: PropTypes.func,
+    sonifySection: PropTypes.func,
 };

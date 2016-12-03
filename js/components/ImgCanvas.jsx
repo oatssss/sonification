@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
 import Konva from 'konva';
-import hocRef from '../useful/HOCRefDecorator.jsx';
+import hocRef from '../utitlities/HOCRefDecorator.jsx';
 
 const jssClasses = {
     kanvas: {
@@ -54,6 +54,8 @@ export default class ImgCanvas extends Component {
         if (this.stage && imgSrc && canvasSize && imgSize) {
             const imageObj = new Image();
             imageObj.onload = () => {
+                this.stage.removeChildren();
+
                 const img = new Konva.Image({
                     image: imageObj,
                     width: imgSize,
@@ -93,6 +95,13 @@ export default class ImgCanvas extends Component {
             };
             imageObj.src = imgSrc;
         }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const imgSrcChanged = nextProps.imgSrc !== this.props.imgSrc;
+        const imgSizeChanged = nextProps.imgSize !== this.props.imgSize;
+
+        return imgSrcChanged || imgSizeChanged;
     }
 
     render() {

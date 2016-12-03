@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import injectSheet from 'react-jss';
 import ImgCanvas from './ImgCanvas.jsx';
-import hocRef from '../useful/HOCRefDecorator.jsx';
+import hocRef from '../utitlities/HOCRefDecorator.jsx';
 
 const jssClasses = {};
 

@@ -9,7 +9,7 @@ var source = require('vinyl-source-stream');
 var gutil = require('gulp-util');
 
 gulp.task('build', function() {
-    browserify({
+    return browserify({
         entries: './js/app.js',
         debug: true
     })
