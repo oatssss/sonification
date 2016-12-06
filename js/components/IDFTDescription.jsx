@@ -76,7 +76,8 @@ export default class IDFTDescription extends Component {
                     <p>
                         We can calculate how similar two signals are with the following formula:
                     </p>
-                    <BlockMath math={'\\sum_{i=0}^{N}x(i) y(i)'}/>
+                    <BlockMath math={'\\sum_{i=0}^{N}x(i) y(i)'}>ASDF</BlockMath>
+                    <BlockMath math={'\\begin{aligned}x &= \\text{signal }x \\\\ y &= \\text{signal }y \\\\ i &= i\\text{th sample} \\\\ N &= \\text{total number of samples} \\end{aligned}'}/>
                     <p>
                         Larger values equate to stronger correlation.
                         Values close to zero mean the two signals aren't very similar at all.
@@ -105,6 +106,7 @@ export default class IDFTDescription extends Component {
                         The formula for the <a href={`https://en.wikipedia.org/wiki/Discrete_Fourier_transform`} target='_blank'>discrete fourier transform</a> is:
                     </p>
                     <BlockMath math={'X_k=\\sum_{n=0}^{N-1}x_n e^{-2 \\pi k n/N}'}/>
+                    <BlockMath math={'\\begin{aligned}N &= \\text{Total number of time samples} \\\\ n &= n\\text{th sample} \\\\ x_n &= \\text{Amplitude at }n\\text{th time sample} \\\\ k &= k\\text{th harmonic} \\\\ X_k &= \\text{Amount of }k\\text{th harmonic (amplitude and phase)}\\end{aligned}'}/>
                     <p>
                         An identity <a href={`https://en.wikipedia.org/wiki/Euler's_formula`} target='_blank'>exists</a> that allows us to rewrite this as:
                     </p>
