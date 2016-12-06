@@ -64,7 +64,7 @@ export default class FileSelect extends Component {
         return (
             <div className={classes.fileOptions}>
                 <input ref={fileSelect => this.fileSelect = fileSelect} id='file' className='hidden' type='file' name='file' accept='image/x-png, image/gif, image/jpeg'/>
-                <label id='file-selector' htmlFor='file' type='button' className={`${classes.filePicker} btn btn-default`}>Choose/Drag Image</label>
+                <label id='file-selector' htmlFor='file' type='button' className={`${classes.filePicker} btn btn-default`}>Select Image</label>
                 <button id='sonify-button' onClick={this.onButton} type='button' className='btn btn-primary'>{this.state.sonifying ? 'Stop' : 'Sonify'}</button>
             </div>
         );

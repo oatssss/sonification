@@ -20,6 +20,7 @@ export default class InteractableCanvas extends ResponsiveCanvas {
         this.drawSection          = this.drawSection.bind(this);
         this.stretchSection       = this.stretchSection.bind(this);
         this.selectSection        = this.selectSection.bind(this);
+        this.deselectSection      = this.deselectSection.bind(this);
         this._calcMousePixelX     = this._calcMousePixelX.bind(this);
     }
 
@@ -167,6 +168,10 @@ export default class InteractableCanvas extends ResponsiveCanvas {
         this.drawingSection = false;
         this.drawHighlightColumn();
         this.props.sonifySection(new Range(this.xs, this.ys, width, height));
+    }
+
+    deselectSection() {
+        this.sectionSelectLayer.hide();
     }
 
     _calcMousePixelX() {

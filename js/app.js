@@ -28,6 +28,7 @@ const jssClasses = {
         minHeight: 'calc(100vh - 42px)',
     },
     innerContent: {
+        width: '100%',
         flex: '1 0 auto',
         display: 'flex',
         flexDirection: 'column',
@@ -86,7 +87,7 @@ class App extends Component {
                     <div className={classes.tabContent}>
                         <FileSelect onImgSelect={this.handleImgSelect} onSonify={this.state.sonify}/>
                         <Tab.Content className={classes.innerContent}>
-                            <Tab.Pane eventKey={TAB_IDFT}>
+                            <Tab.Pane eventKey={TAB_IDFT} style={{width: '100%'}}>
                                 <InverseDFT hocRef={(idft) => this.idft = idft} imgSrc={this.state.imgSrc}/>
                             </Tab.Pane>
                             <Tab.Pane eventKey={TAB_GVAPI}>

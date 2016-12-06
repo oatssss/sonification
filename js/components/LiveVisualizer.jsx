@@ -84,6 +84,8 @@ export default class LiveVisualizer extends Component {
 
         return (
             <div className={classes.outlined}>
+                Live
+                <br/>
                 <canvas ref={(canvas) => this.canvas = canvas} width={this.state.canvasWidth} height={this.state.canvasHeight}/>
             </div>
         );

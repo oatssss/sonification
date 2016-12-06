@@ -6,11 +6,17 @@ import { Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 import Slider from 'material-ui/Slider';
 import { Tooltip, Overlay } from 'react-bootstrap';
 import hocRef from '../../utitlities/HOCRefDecorator.jsx';
-import { turnAudioOn, turnAudioOff, sonifyImgData, changeTotalPeriod, Range } from '../../utitlities/audio-functions.js';
+import { turnAudioOn, turnAudioOff, sonifyImgData, convertImage, changeTotalPeriod, Range } from '../../utitlities/audio-functions.js';
 import LiveVisualizer from '../LiveVisualizer.jsx';
+import TotalPeriodicVisualizer from '../TotalPeriodicVisualizer.jsx';
+import SectionPeriodicVisualizer from '../SectionPeriodicVisualizer.jsx';
+import Markdown from 'react-markdown';
+import { idft1 } from '../../constants/idft-description-markdown.js';
+import { BlockMath } from 'react-katex';
 
 const jssClasses = {
     container: {
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
         flexWrap: 'nowrap',
@@ -32,6 +38,12 @@ const jssClasses = {
     },
     tooltip: {
         zIndex: 'unset !important',
+    },
+    markdown: {
+        marginTop: '20px',
+        padding: '0 20px',
+        width: '100%',
+        maxWidth: '800px',
     },
 };
 
@@ -66,13 +78,17 @@ export default class InverseDFT extends Component {
             colPeriod: 13,
             showPeriodInfo: false,
             playSound: false,
-            sonification: () => {},
+            sonification: () => this.forceUpdate(),
             periodType: periodTypes.SUM,
             sectionWidth: DefaultImgSize,
         };
     }
 
     sizeSelect(size, synthEvent) {
+        convertImage(this.imgData, undefined, true);
+        if (this.state.size > size) {
+            this.interactableCanvas.deselectSection();
+        }
         this.setState({
             size,
             sizeLabel: `${size} x ${size}`,
@@ -82,12 +98,14 @@ export default class InverseDFT extends Component {
 
     setImgData(imgData) {
         this.imgData = imgData;
+        convertImage(this.imgData, undefined, true);
         this.state.sonification();
     }
 
     sonify() {
         sonifyImgData(this.imgData, this.calcTotalPeriodDuration(this.state.colPeriod));
         this.interactableCanvas.deselectColumn();
+        this.interactableCanvas.deselectSection();
         this.setState({
             playSound:true,
             sonification:this.sonify,
@@ -97,6 +115,7 @@ export default class InverseDFT extends Component {
 
     sonifyColumn(x) {
         const section = new Range(x, 0, 1, this.state.size); // A single column as the section
+        this.setState({sectionWidth: section.width});
         sonifyImgData(this.imgData, this.calcColumnPeriodDuration(this.state.colPeriod), section);
         this.setState({
             playSound:true,
@@ -106,13 +125,13 @@ export default class InverseDFT extends Component {
     }
 
     sonifySection(range) {
+        this.setState({sectionWidth: range.width});
+        sonifyImgData(this.imgData, this.calcSectionPeriodDuration(this.state.colPeriod), range);
         this.setState({
             playSound:true,
             sonification:() => this.sonifySection(range),
             periodType: periodTypes.SECTION,
-            sectionWidth: range.width,
         });
-        sonifyImgData(this.imgData, this.calcSectionPeriodDuration(this.state.colPeriod), range);
     }
 
     changePeriodType(periodType) {
@@ -197,7 +216,7 @@ export default class InverseDFT extends Component {
                     sonifySection={this.sonifySection}
                 />
                 <div
-                    style={{position:'relative', width:'100%'}}
+                    style={{position:'relative', width:`${DefaultCanvasSize}px`}}
                     ref={(sliderContainer) => this.sliderContainer = sliderContainer}
                 >
                     <Overlay
@@ -251,15 +270,19 @@ export default class InverseDFT extends Component {
                     />
                 </div>
                 <LiveVisualizer/>
-                IDFT Description
+                <TotalPeriodicVisualizer
+                    style={{marginTop: '20px',marginBottom: '20px'}}
+                    size={this.state.size}
+                />
+                <SectionPeriodicVisualizer/>
+                <Markdown className={classes.markdown} source={idft1}/>
+                <BlockMath>\int_0^\infty x^2 dx</BlockMath>
                 <div className={classes.footer}>
                     <Nav activeKey={this.state.size} onSelect={this.sizeSelect} id='sizes' bsStyle='tabs'>
                         <NavDropdown title={this.state.sizeLabel} id='sizes-dropdown' dropup>
                             <MenuItem eventKey={32}>32 x 32</MenuItem>
                             <MenuItem eventKey={64}>64 x 64</MenuItem>
                             <MenuItem eventKey={128}>128 x 128</MenuItem>
-                            <MenuItem eventKey={256}>256 x 256</MenuItem>
-                            <MenuItem eventKey={512}>512 x 512</MenuItem>
                         </NavDropdown>
                     </Nav>
                 </div>
