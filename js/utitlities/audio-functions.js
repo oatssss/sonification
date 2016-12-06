@@ -12,8 +12,8 @@ export class Range {
         this.height = height;
     }
 }
-
-export const audioContext = new AudioContext();
+let compatibleAudioContext = window.AudioContext || window.webkitAudioContext;
+export const audioContext = new compatibleAudioContext;
 export const analyzer = audioContext.createAnalyser();
 analyzer.connect(audioContext.destination);
 let periodicWave = audioContext.createOscillator();

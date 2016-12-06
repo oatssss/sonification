@@ -10,9 +10,7 @@ import { turnAudioOn, turnAudioOff, sonifyImgData, convertImage, changeTotalPeri
 import LiveVisualizer from '../LiveVisualizer.jsx';
 import TotalPeriodicVisualizer from '../TotalPeriodicVisualizer.jsx';
 import SectionPeriodicVisualizer from '../SectionPeriodicVisualizer.jsx';
-import Markdown from 'react-markdown';
-import { idft1 } from '../../constants/idft-description-markdown.js';
-import { BlockMath } from 'react-katex';
+import IDFTDescription from '../IDFTDescription.jsx';
 
 const jssClasses = {
     container: {
@@ -38,12 +36,6 @@ const jssClasses = {
     },
     tooltip: {
         zIndex: 'unset !important',
-    },
-    markdown: {
-        marginTop: '20px',
-        padding: '0 20px',
-        width: '100%',
-        maxWidth: '800px',
     },
 };
 
@@ -275,8 +267,7 @@ export default class InverseDFT extends Component {
                     size={this.state.size}
                 />
                 <SectionPeriodicVisualizer/>
-                <Markdown className={classes.markdown} source={idft1}/>
-                <BlockMath>\int_0^\infty x^2 dx</BlockMath>
+                <IDFTDescription/>
                 <div className={classes.footer}>
                     <Nav activeKey={this.state.size} onSelect={this.sizeSelect} id='sizes' bsStyle='tabs'>
                         <NavDropdown title={this.state.sizeLabel} id='sizes-dropdown' dropup>

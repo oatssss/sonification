@@ -79,6 +79,8 @@ export default class ImgCanvas extends Component {
                         });
 
                         this.imgLayer.add(scaledImg);
+                        this.imgLayer.getCanvas()._canvas.getContext('2d').imageSmoothingEnabled = false;
+                        this.imgLayer.getCanvas()._canvas.getContext('2d').mozImageSmoothingEnabled = false;
                         this.imgLayer.draw();
                         if (onImgLoad) {
                             const imgData = scaledImg.getCanvas().getContext().getImageData(0, 0, canvasSize, canvasSize);
@@ -89,6 +91,8 @@ export default class ImgCanvas extends Component {
                 }
                 else {
                     this.imgLayer.add(img);
+                    this.imgLayer.getCanvas()._canvas.getContext('2d').imageSmoothingEnabled = false;
+                    this.imgLayer.getCanvas()._canvas.getContext('2d').mozImageSmoothingEnabled = false;
                     this.imgLayer.draw();
                     if (onImgLoad) {
                         const imgData = img.getCanvas().getContext().getImageData(0, 0, canvasSize, canvasSize);
