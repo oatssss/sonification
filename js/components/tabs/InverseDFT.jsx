@@ -6,7 +6,8 @@ import { Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 import Slider from 'material-ui/Slider';
 import { Tooltip, Overlay } from 'react-bootstrap';
 import hocRef from '../../utitlities/HOCRefDecorator.jsx';
-import { turnAudioOn, turnAudioOff, sonifyImgData, changeColumnPeriod, Range } from '../../utitlities/audio-functions.js';
+import { turnAudioOn, turnAudioOff, sonifyImgData, changeTotalPeriod, Range } from '../../utitlities/audio-functions.js';
+import LiveVisualizer from '../LiveVisualizer.jsx';
 
 const jssClasses = {
     container: {
@@ -34,7 +35,14 @@ const jssClasses = {
     },
 };
 
-export const DefaultSize = 512;
+export const DefaultImgSize = 64;
+export const DefaultCanvasSize = 512;
+
+const periodTypes = Object.freeze({
+    SUM: 0,
+    SINGLE: 1,
+    SECTION: 2,
+});
 
 @injectSheet(jssClasses)
 @hocRef
@@ -45,19 +53,22 @@ export default class InverseDFT extends Component {
         this.sizeSelect = this.sizeSelect.bind(this);
         this.setImgData = this.setImgData.bind(this);
         this.sonify = this.sonify.bind(this);
-        this.sonifyPoint = this.sonifyPoint.bind(this);
+        this.sonifyColumn = this.sonifyColumn.bind(this);
         this.sonifySection = this.sonifySection.bind(this);
         this.changeColPeriod = this.changeColPeriod.bind(this);
         this.calcTotalPeriodDuration = this.calcTotalPeriodDuration.bind(this);
         this.calcColumnPeriodDuration = this.calcColumnPeriodDuration.bind(this);
+        this.calcSectionPeriodDuration = this.calcSectionPeriodDuration.bind(this);
 
         this.state = {
-            size: DefaultSize,
-            sizeLabel: `Image Size: ${DefaultSize} x ${DefaultSize}`,
-            columnPeriod: 13,
+            size: DefaultImgSize,
+            sizeLabel: `Image Size: ${DefaultImgSize} x ${DefaultImgSize}`,
+            colPeriod: 13,
             showPeriodInfo: false,
             playSound: false,
             sonification: () => {},
+            periodType: periodTypes.SUM,
+            sectionWidth: DefaultImgSize,
         };
     }
 
@@ -75,32 +86,65 @@ export default class InverseDFT extends Component {
     }
 
     sonify() {
-        sonifyImgData(this.imgData, this.calcTotalPeriodDuration(this.state.columnPeriod));
-        this.setState({playSound:true,sonification:this.sonify});
+        sonifyImgData(this.imgData, this.calcTotalPeriodDuration(this.state.colPeriod));
+        this.interactableCanvas.deselectColumn();
+        this.setState({
+            playSound:true,
+            sonification:this.sonify,
+            periodType: periodTypes.SUM,
+        });
     }
 
-    sonifyPoint(x, y) {
-        const section = new Range(x, y, 1, this.state.size); // A single column as the section
-        sonifyImgData(this.imgData, this.calcTotalPeriodDuration(this.state.columnPeriod), section);
-        this.setState({playSound:true, sonification:() => this.sonifyPoint(x, y)});
+    sonifyColumn(x) {
+        const section = new Range(x, 0, 1, this.state.size); // A single column as the section
+        sonifyImgData(this.imgData, this.calcColumnPeriodDuration(this.state.colPeriod), section);
+        this.setState({
+            playSound:true,
+            sonification:() => this.sonifyColumn(x),
+            periodType: periodTypes.SINGLE,
+        });
     }
 
     sonifySection(range) {
-        sonifyImgData(this.imgData, this.calcTotalPeriodDuration(this.state.columnPeriod), range);
-        this.setState({playSound:true, sonification:() => this.sonifySection(range)});
+        this.setState({
+            playSound:true,
+            sonification:() => this.sonifySection(range),
+            periodType: periodTypes.SECTION,
+            sectionWidth: range.width,
+        });
+        sonifyImgData(this.imgData, this.calcSectionPeriodDuration(this.state.colPeriod), range);
+    }
+
+    changePeriodType(periodType) {
+        this.changeColPeriod(undefined, this.state.colPeriod);
+        this.setState(periodType);
     }
 
     changeColPeriod(event, value) {
-        changeColumnPeriod(this.calcTotalPeriodDuration(value));
-        this.setState({columnPeriod:value});
+        let totalPeriod;
+        if (this.state.periodType === periodTypes.SINGLE) {
+            totalPeriod = this.calcColumnPeriodDuration(value);
+        }
+        else if (this.state.periodType === periodTypes.SECTION) {
+            totalPeriod = this.calcSectionPeriodDuration(value);
+        }
+        else { // periodTypes.SUM
+            totalPeriod = this.calcTotalPeriodDuration(value);
+        }
+        changeTotalPeriod(totalPeriod);
+        this.setState({colPeriod:value});
     }
 
     calcTotalPeriodDuration(sliderVal) {
-        return sliderVal*this.state.size/1000;
+        return sliderVal/1000*this.state.size;
     }
 
     calcColumnPeriodDuration(sliderVal) {
-        return sliderVal;
+        return sliderVal/1000;
+    }
+
+    calcSectionPeriodDuration(sliderVal) {
+        return sliderVal/1000*this.state.sectionWidth;
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -116,6 +160,20 @@ export default class InverseDFT extends Component {
     render() {
         const {sheet: {classes}, children} = this.props;
 
+        let totalPeriodicDuration;
+        let periodicity;
+        if (this.state.periodType === periodTypes.SINGLE) {
+            periodicity = `${Number(this.state.colPeriod).toFixed(2)}ms`;
+        }
+        else if (this.state.periodType === periodTypes.SECTION) {
+            totalPeriodicDuration = this.calcSectionPeriodDuration(this.state.colPeriod);
+            periodicity = `${Number(totalPeriodicDuration).toFixed(2)}s | ${Number(this.state.colPeriod).toFixed(2)}ms`;
+        }
+        else { // periodTypes.SUM
+            totalPeriodicDuration = this.calcTotalPeriodDuration(this.state.colPeriod);
+            periodicity = `${Number(totalPeriodicDuration).toFixed(2)}s | ${Number(this.state.colPeriod).toFixed(2)}ms`;
+        }
+
         return (
             <div
                 ref={(container) => this.container = container}
@@ -130,11 +188,12 @@ export default class InverseDFT extends Component {
                     canvasID={'kanvas-idft-invisible'}
                 />
                 <InteractableCanvas
+                    hocRef={(interactableCanvas) => this.interactableCanvas = interactableCanvas}
                     imgSrc={this.props.imgSrc}
-                    canvasSize={DefaultSize}
+                    canvasSize={DefaultCanvasSize}
                     imgSize={this.state.size}
                     canvasID='kanvas-idft'
-                    sonifyPoint={this.sonifyPoint}
+                    sonifyColumn={this.sonifyColumn}
                     sonifySection={this.sonifySection}
                 />
                 <div
@@ -151,7 +210,7 @@ export default class InverseDFT extends Component {
                             placement='top'
                             id='tooltip-total-period'
                         >
-                            Total Periodic Duration: {Number(this.calcTotalPeriodDuration(this.state.columnPeriod)).toFixed(2)}s
+                            Total Periodic Duration: {Number(totalPeriodicDuration).toFixed(2)}s
                         </Tooltip>
                     </Overlay>
                     <Overlay
@@ -164,31 +223,34 @@ export default class InverseDFT extends Component {
                             placement='bottom'
                             id='tooltip-individual-period'
                         >
-                            Periodic Duration per Column: {Number(this.calcColumnPeriodDuration(this.state.columnPeriod)).toFixed(2)}ms
+                            Periodic Duration per Column: {Number(this.state.colPeriod).toFixed(2)}ms
                         </Tooltip>
                     </Overlay>
                     <span style={{
+                        marginTop: '10px',
                         position: 'absolute',
                         width: '100%',
                         textAlign: 'center',
                     }}>
                         PERIODICITY
                         <br/>
-                        {Number(this.calcTotalPeriodDuration(this.state.columnPeriod)).toFixed(2)}s | {Number(this.calcColumnPeriodDuration(this.state.columnPeriod)).toFixed(2)}ms
+                        {periodicity}
                     </span>
                     <Slider
                         style={{width:'100%',paddingTop:'25px'}}
+                        sliderStyle={{marginBottom:'24px'}}
                         ref={(slider) => this.slider = slider}
                         min={1}
                         max={25}
                         defaultValue={13}
                         step={0.01}
-                        value={this.state.periodSlider}
+                        value={this.state.colPeriod}
                         onChange={this.changeColPeriod}
                         onDragStart={() => this.setState({showPeriodInfo:true})}
                         onDragStop={() => this.setState({showPeriodInfo:false})}
                     />
                 </div>
+                <LiveVisualizer/>
                 IDFT Description
                 <div className={classes.footer}>
                     <Nav activeKey={this.state.size} onSelect={this.sizeSelect} id='sizes' bsStyle='tabs'>

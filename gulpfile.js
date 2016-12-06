@@ -16,7 +16,8 @@ gulp.task('build', function() {
     .transform(babelify, {
         presets: [
             'es2015',
-            'react'
+            'react',
+            'stage-0',
         ],
         plugins: [
             'transform-decorators-legacy',

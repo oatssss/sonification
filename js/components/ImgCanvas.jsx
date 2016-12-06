@@ -9,7 +9,7 @@ const jssClasses = {
         marginBottom: '10px',
         outline: 'black solid thin',
     },
-};
+}
 
 @injectSheet(jssClasses)
 @hocRef
@@ -31,11 +31,17 @@ export default class ImgCanvas extends Component {
             container: this.props.canvasID,
             width: canvasSize,
             height: canvasSize,
+            draggable: true,
+            dragBoundFunc: () => ({x:0,y:0}),
         });
+        this.imgLayer = new Konva.Layer();
+        this.stage.add(this.imgLayer);
+        this.imgLayer.moveToBottom();
     }
 
     componentWillUnmount() {
         // Stop audio
+
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -54,16 +60,13 @@ export default class ImgCanvas extends Component {
         if (this.stage && imgSrc && canvasSize && imgSize) {
             const imageObj = new Image();
             imageObj.onload = () => {
-                this.stage.removeChildren();
+                this.imgLayer.removeChildren();
 
                 const img = new Konva.Image({
                     image: imageObj,
                     width: imgSize,
                     height: imgSize,
                 });
-
-                const layer = new Konva.Layer();
-                layer.add(img);
 
                 if (canvasSize !== imgSize) {
                     const scaledImageObj = new Image();
@@ -75,9 +78,8 @@ export default class ImgCanvas extends Component {
                             height: canvasSize,
                         });
 
-                        const scaledLayer = new Konva.Layer();
-                        scaledLayer.add(scaledImg);
-                        this.stage.add(scaledLayer);
+                        this.imgLayer.add(scaledImg);
+                        this.imgLayer.draw();
                         if (onImgLoad) {
                             const imgData = scaledImg.getCanvas().getContext().getImageData(0, 0, canvasSize, canvasSize);
                             onImgLoad(imgData);
@@ -86,7 +88,8 @@ export default class ImgCanvas extends Component {
                     scaledImageObj.src = img.toDataURL();
                 }
                 else {
-                    this.stage.add(layer);
+                    this.imgLayer.add(img);
+                    this.imgLayer.draw();
                     if (onImgLoad) {
                         const imgData = img.getCanvas().getContext().getImageData(0, 0, canvasSize, canvasSize);
                         onImgLoad(imgData);

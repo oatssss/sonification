@@ -1,7 +1,7 @@
-import React, {PropTypes} from 'react';
+import React, {Component, PropTypes} from 'react';
 
 export default function(DecoratedComponent) {
-    class HOCRefDecorated extends DecoratedComponent {
+    class HOCRefDecorated extends Component {
         componentDidMount() {
             if (this.props.hocRef) {
                 this.props.hocRef(this.wrapped);
