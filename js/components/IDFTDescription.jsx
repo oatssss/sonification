@@ -196,9 +196,7 @@ export default class IDFTDescription extends Component {
                     </li>
                 </ul>
                 <p>
-                    And of course, none of this would be possible without
-                    <a href='https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API' target='_blank'>Web Audio API</a>
-                    support within the browser. This allows us to create wavetable oscillators
+                    And of course, none of this would be possible without <a href='https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API' target='_blank'>Web Audio API</a> support within the browser. This allows us to create wavetable oscillators
                     that playback through the device's speakers.
                 </p>
                 <h1>Challenges</h1>
