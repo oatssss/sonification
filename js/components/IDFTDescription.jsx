@@ -93,7 +93,7 @@ export default class IDFTDescription extends Component {
                                     <InlineMath>x</InlineMath> and <InlineMath>y</InlineMath> are signals with <InlineMath>N</InlineMath> samples.
                                     If the signals are similar, then <InlineMath>x(i)</InlineMath> will be positive at the same time <InlineMath>y(i)</InlineMath> is positive.
                                     Likewise, <InlineMath>x(i)</InlineMath> will be negative if <InlineMath>y(i)</InlineMath> is negative.
-                                    For both cases, the product of <InlineMath>x(i)y(i)</InlineMath> will be positive (since <InlineMath>pos*pos=neg</InlineMath> and <InlineMath>neg*neg=pos</InlineMath>).
+                                    For both cases, the product of <InlineMath>x(i)y(i)</InlineMath> will be positive (since <InlineMath>pos*pos=pos</InlineMath> and <InlineMath>neg*neg=pos</InlineMath>).
                                     Therefore, very similar signals will have very high sums.
                                 </p>
                             </Well>
