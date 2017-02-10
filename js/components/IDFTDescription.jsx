@@ -151,7 +151,96 @@ export default class IDFTDescription extends Component {
                     <li>
                         Concatenate each column's signal into one huge time-domain signal. This joined signal "spans" all the columns.
                     </li>
+                    <li>
+                        Perform a DFT on the signal to get its frequency components.
+                    </li>
+                    <li>
+                        Set signalReal[0] = 0 and signalImage[0] = 0 for no DC offset.
+                    </li>
+                    <li>
+                        Use the Web Audio API's createPeriodicWave() to run an IDFT over the components and reconstruct the concatenated signal.
+                    </li>
                 </ol>
+                <p>
+                    Steps 3-5 are necessary due to the nature of wavetable oscillation within the browser.
+                    We don't know the implementation details of createPeriodicWave() so we cannot replicate the
+                    time-domain signal it produces using our own methods. Instead, we must call it with arguments its familiar with.
+                </p>
+                <h1>Technology Used</h1>
+                <hr/>
+                <ul>
+                    <li>
+                        <a href='https://github.com/corbanbrook/dsp.js/' target='_blank'>dsp.js</a> - Digital Sound Processing JavaScript library
+                    </li>
+                    <li>
+                        <a href='https://facebook.github.io/react/' target='_blank'>React</a>,
+                        <a href='http://getbootstrap.com/' target='_blank'>Bootstrap</a>,
+                        <a href='http://www.material-ui.com/' target='_blank'>Material UI</a>,
+                        and the <a href='https://konvajs.github.io/docs/' target='_blank'>Konva</a> HTML5 Canvas construct the interface components
+                    </li>
+                    <li>
+                        <a href='https://github.com/cssinjs/jss' target='_blank'>JSS</a> - CSS styles within JS (plus a bunch of other CSS features)
+                    </li>
+                    <li>
+                        <a href='https://khan.github.io/KaTeX/' target='_blank'>KaTeX</a> - LaTeX-like math rendering in the browser
+                    </li>
+                    <li>
+                        <a href='https://babeljs.io/' target='_blank'>Babel</a> - Transpile es2015+ to javascript that current browsers understand
+                    </li>
+                    <li>
+                        <a href='http://browserify.org/' target='_blank'>Browserify</a> - Concatenate all js files into a single bundle.js
+                    </li>
+                    <li>
+                        <a href='http://gulpjs.com/' target='_blank'>Gulp</a> - Automated build tasks
+
+                    </li>
+                </ul>
+                <p>
+                    And of course, none of this would be possible without
+                    <a href='https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API' target='_blank'>Web Audio API</a>
+                    support within the browser. This allows us to create wavetable oscillators
+                    that playback through the device's speakers.
+                </p>
+                <h1>Challenges</h1>
+                <hr/>
+                <ul>
+                    <li>
+                        The <i>Highlighted Section</i> oscilloscope is buggy and isn't always correct
+                    </li>
+                    <li>
+                        The naive DFT becomes slow for images larger than 256x256 pixels, but the Fast Fourier Transform only works with perfect squares
+                    </li>
+                    <li>
+                        Web development in general - writing program logic and designing an interface at the same time, not to mention the difficulty with trying to figure out css styles (esp. centering)
+                    </li>
+                </ul>
+                <h1>Future Work</h1>
+                <hr/>
+                <h5><b>Different Algorithms for Calculating the Harmonic Spectrum</b></h5>
+                <div style={{margin:'0 20px 20px 20px'}}>
+                    <p>
+                        Currently, the amplitudes of the signal's harmonic components are calculated using a very basic method,
+                        but this can be as complex as we like. There's lots of potential in finding a method to map images
+                        to more interesting sounds.
+                    </p>
+                    <p>
+                        Additionally, since the current algorithm gives equal weight to each colour component in the sum,
+                        an image will produce the same signal as its black/white counterpart. A better algorithm might be
+                        designed that gives more importance to varying colours in an image.
+                    </p>
+                </div>
+                <h5><b>Higher Level Approaches</b></h5>
+                <div style={{margin:'0 20px 20px 20px'}}>
+                    <p>
+                        Forming the signal for an image by mapping its pixels to frequency components achieves the objective
+                        in a very literal manner. We can explore the use of the Google Vision API and its ability to map an
+                        image to related words, effectively generalizing the task of sonifying images to sonifying data.
+                    </p>
+                    <p>
+                        An interesting task would be to try and acquire the emotional content of an image as this would
+                        allow us to map images to musical scales.
+                    </p>
+                </div>
             </div>
         );
     }
